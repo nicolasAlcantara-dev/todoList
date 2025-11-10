@@ -1,33 +1,38 @@
 package com.example.todoList.service;
 
 import com.example.todoList.Model.Todo;
-import com.example.todoList.Model.User;
 import com.example.todoList.Repository.TodoRepository;
-import com.example.todoList.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TodoService {
     @Autowired
     private TodoRepository todoRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    public Todo getById(Long id) {
+        return todoRepository.findById(id).orElseThrow();
+    }
 
-    public Todo createTodoForUser(Long userId, Todo todo) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        // Associa o todo ao usuário
-        user.addTodo(todo);
+    public Todo createTodo(Todo todo) {
         return todoRepository.save(todo);
     }
 
-    public List<Todo> getUserTodos(Long userId) {
-        return todoRepository.findByUserId(userId);
+    public List<Todo> readTodo() {
+        return todoRepository.findAll();
+    }
+
+    public Todo updateTodo(Todo todo, Long id) {
+        Todo todoExist = todoRepository.findById(id).orElseThrow();
+        todoExist.setTitle(todoExist.getTitle());
+        todoExist.setCompleted(todo.isCompleted());
+        todoRepository.save(todoExist);
+        return todoExist;
+    }
+
+    public void deleteById(Long id) {
+        todoRepository.deleteById(id);
     }
 }
